@@ -43,7 +43,35 @@ const SHoverLayer = styled.div`
 
 const KeplrButton = (props: IConnectButtonProps) => (
     <SConnectButtonContainer>
-        <Button onClick={props.onClick} disabled={props.disabled}>
+        <Button
+            onClick={props.onClick}
+            disabled={props.disabled}
+            variant={"contained"}
+            sx={{
+                borderRadius: 15,
+                p: 2,
+                boxShadow:
+                    "inset 0 0 50px #fff, /* inner white */ \
+                inset 20px 0 80px #f0f,   /* inner left magenta short */ \
+                inset -20px 0 80px #0ff,  /* inner right cyan short */ \
+                inset 20px 0 300px #f0f,  /* inner left magenta broad */ \
+                inset -20px 0 300px #0ff, /* inner right cyan broad */ \
+                0 0 50px #fff,            /* outer white */ \
+                -10px 0 80px #f0f,        /* outer left magenta */ \
+                10px 0 80px #0ff;         /* outer right cyan */",
+                ":hover": {
+                    boxShadow:
+                        "inset 0 0 50px #fff, /* inner white */ \
+                    inset 20px 0 80px #f0f,   /* inner left magenta short */ \
+                    inset -20px 0 80px #0ff,  /* inner right cyan short */ \
+                    inset 20px 0 300px #f0f,  /* inner left magenta broad */ \
+                    inset -20px 0 300px #0ff, /* inner right cyan broad */ \
+                    0 0 50px #fff,            /* outer white */ \
+                    -10px 0 80px #f0f,        /* outer left magenta */ \
+                    10px 0 80px #0ff;         /* outer right cyan */",
+                },
+            }}
+        >
             <div
                 style={{
                     display: "flex",
@@ -52,12 +80,7 @@ const KeplrButton = (props: IConnectButtonProps) => (
                 }}
             >
                 <SHoverLayer />
-                <object
-                    data="/icons/keplr.svg"
-                    type="image/svg+xml"
-                    width={26}
-                    height={26}
-                />
+
                 {toDisplayAddress(props?.address) || "Connect Wallet"}
             </div>
         </Button>

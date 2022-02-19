@@ -12,10 +12,11 @@ export const GetContractCodeHash = async ({
     return await secretjs.query.compute.contractCodeHash(address);
 };
 
-export const setupKeplr = async () => {
+export const setupKeplrCustomChain = async () => {
     if (!window || !window.keplr) {
         return;
     }
+
     await window.keplr.experimentalSuggestChain({
         chainId: import.meta.env.VITE_SECRET_CHAIN_ID,
         chainName: import.meta.env.VITE_SECRET_CHAIN_NAME || "secretdev",

@@ -4,11 +4,16 @@ import { useSecret, getPermitFromUser } from "../../hooks/useSecret";
 import { PERMIT_NAME, PERMIT_PERMISSION } from "../../contracts/scrt/memo";
 
 const CreatePermitButton: React.FC = () => {
-    const { secretjs, account, newPermit } = useSecret();
+    const { secretjs, account, newPermit, chainId } = useSecret();
 
     return (
         <>
             <Button
+                variant={"outlined"}
+                sx={{
+                    color: "#ffffff",
+                    borderRadius: 15,
+                }}
                 onClick={async () => {
                     if (!account || !secretjs) {
                         return;

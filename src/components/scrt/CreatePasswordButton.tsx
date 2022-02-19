@@ -9,6 +9,7 @@ const CreatePasswordButton: React.FC = () => {
     return (
         <>
             <Button
+                disabled={true}
                 onClick={async () => {
                     if (!account || !secretjs) {
                         return;

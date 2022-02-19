@@ -8,9 +8,15 @@ import ConnectSecret from "../components/scrt/ConnectSecret";
 import { toDisplayAddress } from "../utils/address";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import Paper from "@mui/material/Paper";
+
+window.addEventListener("keplr_keystorechange", () => {
+    console.log("Key store in Keplr is changed. Refreshing page.");
+    location.reload();
+});
 
 const Login = () => {
-    const { account, permit } = useSecret();
+    const { account, permit, chainId } = useSecret();
     const navigate = useNavigate();
     // const { width } = useWindowSize();
     // const isMobile = parseInt(breakingPoints.medium) > width;
@@ -28,7 +34,7 @@ const Login = () => {
             </Then>
             <Else>
                 <>
-                    <Box
+                    <Paper
                         sx={{
                             position: "absolute",
                             top: "50%",
@@ -36,43 +42,116 @@ const Login = () => {
                             transform: "translate(-50%, -50%)",
                             width: "600px",
                             maxHeight: "100vh",
+                            minHeight: "400px",
                             overflowY: "auto",
+                            border: 4,
+                            borderRadius: 15,
+                            borderColor: "#7289da",
                         }}
                     >
                         <Grid
                             container
                             spacing={2}
-                            sx={{ justifyContent: "center" }}
+                            sx={{
+                                justifyContent: "center",
+                            }}
                         >
-                            <Grid item sx={{ width: "80%" }} container>
-                                <Typography variant={"h1"}>
-                                    Welcome to Memo!
+                            <Grid
+                                item
+                                sx={{
+                                    width: "80%",
+                                    display: "flex",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <Typography variant={"h1"}>Whisper</Typography>
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                                sx={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <Typography variant={"h5"}>
+                                    Decentralized Private Messaging
                                 </Typography>
                             </Grid>
-                            <Grid item sx={{ justifyContent: "center" }}>
-                                <Typography variant={"h3"}>
+                            <Grid
+                                item
+                                xs={12}
+                                sx={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <Typography variant={"h6"}>
                                     {account
-                                        ? `Hello ${toDisplayAddress(account)}`
-                                        : "Connect Wallet to Continue"}
+                                        ? `${toDisplayAddress(account)}`
+                                        : null}
                                 </Typography>
                             </Grid>
-                            <If condition={account}>
-                                <Then>
-                                    <Grid item xs={6}>
-                                        <CreatePermitButton />
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <CreatePasswordButton />
-                                    </Grid>
-                                </Then>
-                                <Else>
-                                    <Grid item xs={12}>
-                                        <ConnectSecret />
-                                    </Grid>
-                                </Else>
-                            </If>
+                            <Grid
+                                container
+                                rowGap={10}
+                                sx={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <If condition={account}>
+                                    <Then>
+                                        <Grid
+                                            container
+                                            sx={{
+                                                display: "flex",
+                                                marginTop: "40px",
+                                            }}
+                                        >
+                                            <Grid
+                                                item
+                                                xs={6}
+                                                sx={{
+                                                    display: "flex",
+                                                    justifyContent: "center",
+                                                }}
+                                            >
+                                                <CreatePermitButton />
+                                            </Grid>
+                                            <Grid
+                                                item
+                                                xs={6}
+                                                sx={{
+                                                    display: "flex",
+                                                    justifyContent: "center",
+                                                }}
+                                            >
+                                                <CreatePasswordButton />
+                                            </Grid>
+                                        </Grid>
+                                    </Then>
+                                    <Else>
+                                        <Grid
+                                            item
+                                            xs={12}
+                                            sx={{
+                                                display: "flex",
+                                                justifyContent: "center",
+                                            }}
+                                        >
+                                            <ConnectSecret chainId={chainId} />
+                                        </Grid>
+                                    </Else>
+                                </If>
+                                <Grid item>
+                                    <Typography variant={"caption"}>
+                                        Powered by Secret Network
+                                    </Typography>
+                                </Grid>
+                            </Grid>
                         </Grid>
-                    </Box>
+                    </Paper>
                 </>
             </Else>
         </If>

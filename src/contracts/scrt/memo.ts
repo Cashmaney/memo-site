@@ -68,28 +68,22 @@ export const PERMIT_PERMISSION: Permission[] = ["history"];
 
 export const sendMemo = async (
     sender: SecretNetworkClient,
-    senderAddress: string,
     contract: string,
     to: string,
     message: string,
     codeHash?: string,
+    onLoading?: CallableFunction,
     onSuccess?: CallableFunction,
     onFail?: CallableFunction,
 ) => {
     const msg = new SendMemoMsg(to, message).to_msg();
 
-    const txMsg = new MsgExecuteContract({
-        sender: senderAddress,
-        contract,
-        msg,
-        codeHash,
-    });
-
-    sender.tx
-        .broadcast([txMsg], {
-            gasLimit: 150_000,
-            gasPriceInFeeDenom: 0.25,
-            feeDenom: "uscrt",
+    sender.tx.compute
+        .executeContract({
+            codeHash,
+            contract,
+            msg,
+            sender: sender.address,
         })
         .then(() => {
             if (onSuccess) {
@@ -97,6 +91,7 @@ export const sendMemo = async (
             }
         })
         .catch((e) => {
+            console.log(`error: ${e}`);
             if (onFail) {
                 onFail(e);
             }
@@ -115,9 +110,17 @@ export const getMessages = async (
 ): Promise<ReadMessagesResponse> => {
     const msg = new ReadMessages(address, auth, page, page_size).to_msg();
 
-    return secretjs.query.compute.queryContract({
-        address: contract,
-        codeHash: codeHash,
-        query: msg,
-    });
+    console.log(`getting messages for: ${address}`);
+
+    return secretjs.query.compute
+        .queryContract({
+            address: contract,
+            codeHash: codeHash,
+            query: msg,
+        })
+        .catch((e) => {
+            if (onFail) {
+                onFail(e);
+            }
+        });
 };

@@ -5,7 +5,7 @@ import { sleep } from "../utils/functions";
 import { newPermit as signPermit, Permission, Permit } from "./scrt/permit";
 import { Keplr } from "@keplr-wallet/types";
 // import { TokenID } from "../utils/nft";
-import { setupKeplr } from "./scrt/utils";
+import { setupKeplrCustomChain } from "./scrt/utils";
 import { OfflineSigner } from "@cosmjs/launchpad";
 import { OfflineDirectSigner } from "@cosmjs/proto-signing";
 import { SecretUtils } from "secretjs/types/enigmautils";
@@ -55,6 +55,8 @@ export const SecretChainContext = createContext<{
     permit?: Permit;
     newPermit: CallableFunction;
     deletePermit: CallableFunction;
+    chainId: string;
+    setChainId: CallableFunction;
 }>({
     secretLoaded: false,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -67,6 +69,9 @@ export const SecretChainContext = createContext<{
     newPermit() {},
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     deletePermit() {},
+    chainId: import.meta.env.VITE_SECRET_CHAIN_ID,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    setChainId() {},
 });
 
 const getStoragePermitName = (account: string, permitName: string) => {
@@ -106,12 +111,22 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
     const [secretjs, setSecretJS] = useState<SecretNetworkClient | undefined>(
         undefined,
     );
+    const [chainId, setChainId] = useState<string>(
+        import.meta.env.VITE_SECRET_CHAIN_ID,
+    );
     const [account, setLocalAccount] = useState<string>("");
     const [secretLoaded, setSecretLoaded] = useState<boolean>(false);
     const [accountPermit, setPermit] = useState<Permit | undefined>(undefined);
     const [scrtBalance, setScrtBalance] = useState<string | undefined>(
         undefined,
     );
+
+    useEffect(() => {
+        if (secretjs) {
+            setupSecretJS(chainId);
+        }
+    }, [chainId]);
+
     //const [permitManager] = useState<PermitManager>(new PermitManager());
 
     // const savePermit = (permitName: string, permit: Permit) => {
@@ -134,13 +149,19 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
             const permit = await signPermit(
                 window.keplr as Keplr,
                 account,
-                import.meta.env.VITE_SECRET_CHAIN_ID,
+                chainId,
                 permitName,
                 tokens,
                 permissions,
             );
 
             if (permit) {
+                const storagePermitName = getStoragePermitName(
+                    account,
+                    permitName,
+                );
+
+                setToLS(storagePermitName, JSON.stringify(permit));
                 setPermit(permit);
             }
 
@@ -198,15 +219,19 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
 
     useEffect(() => {
         // first load, instantly refresh balances
-        getScrtBalance(secretjs, account).then((balance) => {
-            if (balance) {
-                setScrtBalance(balance);
-            }
-        });
-        getLocalPermit(PERMIT_NAME);
-    }, [secretjs, account]);
+        if (secretjs && account) {
+            getScrtBalance(secretjs, account).then((balance) => {
+                if (balance) {
+                    setScrtBalance(balance);
+                }
+            });
+        }
+        if (account) {
+            getLocalPermit(PERMIT_NAME);
+        }
+    }, [account]);
 
-    const setupSecretJS = async () => {
+    const setupSecretJS = async (chainId?: string) => {
         // Wait for Keplr to be injected to the page
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -218,21 +243,34 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
             await sleep(50);
         }
 
-        if (import.meta.env.VITE_SECRET_CHAIN_ID !== "secret-4") {
-            await setupKeplr();
+        console.log(`setting up with chain id: ${chainId}`);
+
+        if (import.meta.env.VITE_SECRET_CHAIN_ID === chainId) {
+            await setupKeplrCustomChain();
         }
 
-        await window.keplr.enable(import.meta.env.VITE_SECRET_CHAIN_ID);
+        // await window.keplr.enable([
+        //     "secret-4",
+        //     "cosmoshub-4",
+        //     "import.meta.env.VITE_SECRET_CHAIN_ID",
+        // ]);
+
+        // await window.keplr.enable(import.meta.env.VITE_SECRET_CHAIN_ID);
 
         // Setup SecretJS with Keplr’s OfflineSigner
         // This pops-up a window for the user to sign on each tx we sent
         const keplrOfflineSigner = window.getOfflineSignerOnlyAmino(
-            import.meta.env.VITE_SECRET_CHAIN_ID,
+            chainId || import.meta.env.VITE_SECRET_CHAIN_ID,
         );
         const accounts = await keplrOfflineSigner.getAccounts();
 
         const secretjs = await SecretNetworkClient.create(
             import.meta.env.VITE_SECRET_RPC,
+            {
+                walletAddress: accounts[0].address,
+                chainId: chainId || import.meta.env.VITE_SECRET_CHAIN_ID,
+                wallet: keplrOfflineSigner,
+            },
         );
 
         setAccount(accounts[0].address);
@@ -253,6 +291,8 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
                 permit: accountPermit,
                 deletePermit,
                 newPermit,
+                chainId,
+                setChainId,
             }}
         >
             {props.children}

@@ -4,7 +4,7 @@ import { alpha, styled } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 
 import Typography from "@mui/material/Typography";
-import { FormControl, InputLabel } from "@mui/material";
+import { FormControl, InputLabel, useTheme } from "@mui/material";
 import CloseModalIcon from "../icons/CloseModal";
 import Button from "@mui/material/Button";
 import { isValidBech32 } from "../../utils/address";
@@ -17,30 +17,15 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
         marginTop: theme.spacing(1),
     },
     "& .MuiInputBase-input": {
-        borderRadius: 4,
         position: "relative",
-        backgroundColor: theme.palette.mode === "light" ? "#fcfcfb" : "#2b2b2b",
-        border: "1px solid #ced4da",
-        fontSize: 16,
+        // backgroundColor: theme,
+        fontFamily: "inter",
         padding: "10px 12px",
         transition: theme.transitions.create([
             "border-color",
             "background-color",
             "box-shadow",
         ]),
-        // Use the system font instead of the default Roboto font.
-        fontFamily: [
-            "-apple-system",
-            "BlinkMacSystemFont",
-            '"Segoe UI"',
-            "Roboto",
-            '"Helvetica Neue"',
-            "Arial",
-            "sans-serif",
-            '"Apple Color Emoji"',
-            '"Segoe UI Emoji"',
-            '"Segoe UI Symbol"',
-        ].join(","),
         "&:focus": {
             boxShadow: `${alpha(
                 theme.palette.primary.main,
@@ -54,6 +39,7 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
 const SendMsgForm: React.FC<{
     handleClose: CallableFunction;
 }> = ({ handleClose }) => {
+    const theme = useTheme();
     const { secretjs, account } = useSecret();
     const [toAddress, setToAddress] = useState<string>("");
     const [msg, setMsg] = useState<string>("");
@@ -62,35 +48,41 @@ const SendMsgForm: React.FC<{
     const [validMsg, setValidMsg] = useState<boolean>(true);
 
     useEffect(() => {
-        console.log(`testing`);
         setValidAddress(isValidBech32(toAddress));
     }, [toAddress]);
 
     useEffect(() => {
-        console.log(`hello: ${msg.length < 280}`);
-        setValidMsg(msg.length < 280);
+        setValidMsg(msg.length < 280 && msg.length > 0);
     }, [msg]);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (secretjs && account) {
-            await sendMemo(
+            sendMemo(
                 secretjs,
-                account,
                 import.meta.env.VITE_MEMO_CONTRACT_ADDRESS,
                 toAddress,
                 msg,
                 import.meta.env.VITE_MEMO_CONTRACT_CODE_HASH,
                 () => {
+                    toast.dismiss("sending");
                     toast.success("Memo sent successfully");
                 },
-                (error: any) => {
-                    toast.error(
-                        `Failed to send memo: ${JSON.stringify(error)}`,
-                    );
+                (error: Error) => {
+                    toast.dismiss("sending");
+                    if (error.message === "Request rejected") {
+                        toast.error(`Request canceled`);
+                    } else {
+                        toast.error(`Failed to send memo: ${error.message}`);
+                    }
                 },
-            );
-            handleClose();
+            ).finally(() => {
+                handleClose();
+            });
+            toast.info("Sending memo...", {
+                autoClose: false,
+                toastId: "loading_keplr",
+            });
         }
     };
 
@@ -122,13 +114,13 @@ const SendMsgForm: React.FC<{
                 <Typography variant={"h3"}>
                     <span
                         style={{
-                            color: "#00d8ff",
+                            color: theme.palette.primary.main,
                             marginRight: "0.5rem",
                         }}
                     >
                         Send
                     </span>{" "}
-                    Memo
+                    Whisper
                 </Typography>
                 <div
                     style={{
@@ -148,8 +140,7 @@ const SendMsgForm: React.FC<{
                             placeItems: "center",
                             textAlign: "center",
                             padding: "1em 0",
-                            marginBottom: "1.5em",
-                            fontFamily: "roboto",
+                            fontFamily: "Inter",
                             fontSize: isMobile ? 10 : 22,
                         }}
                     >
@@ -163,18 +154,26 @@ const SendMsgForm: React.FC<{
                                     sx={{
                                         display: "flex",
                                         justifyContent: "flex-start",
-                                        maxWidth: "80%",
+                                        maxWidth: "100%",
                                         marginBottom: "1rem",
                                     }}
                                     error={!validAddress}
                                 >
-                                    <InputLabel htmlFor="send-to-address">
+                                    <InputLabel
+                                        shrink
+                                        htmlFor="send-to-address"
+                                        sx={{
+                                            fontSize: "1.1rem",
+                                        }}
+                                    >
                                         To
                                     </InputLabel>
                                     <BootstrapInput
+                                        fullWidth
                                         id="send-to-address"
                                         aria-describedby="send-to-address-text"
                                         value={toAddress}
+                                        placeholder={"cosmos1..."}
                                         onChange={(value) => {
                                             setToAddress(value.target.value);
                                         }}
@@ -187,15 +186,24 @@ const SendMsgForm: React.FC<{
                                     sx={{
                                         width: 500,
                                         maxWidth: "100%",
+                                        marginTop: "1.2rem",
+                                        marginBottom: "1.5rem",
                                     }}
                                     error={!validMsg}
                                 >
-                                    <InputLabel shrink htmlFor="message-input">
+                                    <InputLabel
+                                        shrink
+                                        htmlFor="message-input"
+                                        sx={{
+                                            fontSize: "1.1rem",
+                                        }}
+                                    >
                                         Message
                                     </InputLabel>
                                     <BootstrapInput
                                         fullWidth
                                         multiline
+                                        placeholder={"Hola, Hi, Shalom"}
                                         id="message-input"
                                         value={msg}
                                         onChange={(value) => {
@@ -204,7 +212,7 @@ const SendMsgForm: React.FC<{
                                     />
                                 </FormControl>
                                 <Button
-                                    sx={{ m: 4 }}
+                                    sx={{ m: 2 }}
                                     variant={"contained"}
                                     color={"primary"}
                                     type="submit"

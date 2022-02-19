@@ -7,6 +7,8 @@ import Footer from "../components/layout/footer/Footer";
 
 import ContextProvider from "../hooks/ContextProvider";
 import Messages from "./Messages";
+import { PERMIT_NAME } from "../contracts/scrt/memo";
+import "./App.css";
 
 function App() {
     return (

@@ -6,9 +6,9 @@ import CreatePasswordButton from "../components/scrt/CreatePasswordButton";
 const Home = () => {
     return (
         <div>
-            <Typography variant={"h1"}>Welcome to Memo!</Typography>
+            <Typography variant={"h1"}>Welcome to Whisper!</Typography>
             <Typography variant={"h3"}>Login using your wallet</Typography>
-            <Typography variant={"body2"}>Create a viewing key</Typography>
+            <Typography variant={"body2"}>Sign a permit</Typography>
             <Typography variant={"body2"}>Or create a password</Typography>
             <CreatePermitButton />
             <CreatePasswordButton />

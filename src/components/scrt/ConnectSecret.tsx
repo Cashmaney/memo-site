@@ -1,17 +1,21 @@
 import React from "react";
 import KeplrButton from "./KeplrButton";
-import { useSecret, getPermitFromUser } from "../../hooks/useSecret";
-import { PERMIT_NAME, PERMIT_PERMISSION } from "../../contracts/scrt/memo";
+import { useSecret } from "../../hooks/useSecret";
 
 const ConnectSecret: React.FC<{
     className?: string;
     clickAction?: CallableFunction;
-}> = (props: { className?: string; clickAction?: CallableFunction }) => {
+    chainId?: string;
+}> = (props: {
+    className?: string;
+    clickAction?: CallableFunction;
+    chainId?: string;
+}) => {
     const { setupSecretJS, secretjs, account } = useSecret();
 
     const initKeplr = async () => {
         if (!secretjs) {
-            await setupSecretJS();
+            await setupSecretJS(props.chainId);
         }
 
         if (!account) {

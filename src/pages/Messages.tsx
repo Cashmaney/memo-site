@@ -6,12 +6,19 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { Else, If, Then } from "react-if";
 import SendMsgModal from "../components/modals/SendMsgModal";
+import Button from "@mui/material/Button";
+import Paper from "@mui/material/Paper";
+import { Typography, useTheme } from "@mui/material";
+import { toDisplayAddress } from "../utils/address";
+import Box from "@mui/material/Box";
+import Navbar from "../components/layout/navBar/Navbar";
 
 const MessagesPage: React.FC = () => {
-    const { secretjs, account, permit, deletePermit } = useSecret();
+    const { secretjs, account, permit, chainId } = useSecret();
     const [loadingMsgs, setLoading] = useState<boolean>(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const navigate = useNavigate();
+    const theme = useTheme();
 
     useEffect(() => {
         if (!permit) {
@@ -19,7 +26,7 @@ const MessagesPage: React.FC = () => {
         }
     }, [permit]);
 
-    const getMyMessages = async () => {
+    const getMyMessages = async (): Promise<void> => {
         if (account && secretjs) {
             if (permit) {
                 setLoading(true);
@@ -31,7 +38,10 @@ const MessagesPage: React.FC = () => {
                     import.meta.env.VITE_MEMO_CONTRACT_CODE_HASH,
                 )
                     .then((resp) => {
-                        toast.success(`Successfully refreshed messages`);
+                        toast.success(`Refreshed messages`, {
+                            pauseOnHover: false,
+                            autoClose: 2000,
+                        });
                         setMessages(resp.msgs);
                     })
                     .catch((e) => {
@@ -45,8 +55,9 @@ const MessagesPage: React.FC = () => {
     };
 
     useEffect(() => {
+        // noinspection JSIgnoredPromiseFromCall
         getMyMessages();
-    }, [account, secretjs]);
+    }, [account]);
 
     return (
         <If condition={!permit}>
@@ -55,25 +66,17 @@ const MessagesPage: React.FC = () => {
             </Then>
             <Else>
                 <>
-                    <div
-                        style={{
+                    <Navbar />
+                    <Box
+                        sx={{
                             display: "flex",
-                            justifyContent: "space-between",
+                            justifyContent: "flex-start",
+                            marginLeft: "9vw",
                         }}
                     >
-                        <div>Logged in as: {account}</div>
-                        <button
-                            onClick={() => {
-                                {
-                                    deletePermit(PERMIT_NAME);
-                                }
-                            }}
-                        >
-                            log out
-                        </button>
-                    </div>
+                        <SendMsgModal />
+                    </Box>
                     <MessagesTable messages={messages} loading={loadingMsgs} />
-                    <SendMsgModal />
                 </>
             </Else>
         </If>

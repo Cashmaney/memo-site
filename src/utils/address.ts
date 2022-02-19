@@ -50,5 +50,5 @@ export const toDisplayAddress = (address: string | undefined) => {
     if (!address) {
         return;
     }
-    return `${address.slice(0, 8)}..${address.slice(-2, address.length)}`;
+    return `${address.slice(0, 9)}..${address.slice(-3, address.length)}`;
 };
