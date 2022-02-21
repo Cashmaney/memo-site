@@ -167,19 +167,19 @@ const networks: Network[] = [
         chainId: "pulsar-2",
         displayName: "Secret Testnet",
         id: "secret-testnet",
-        img: "/public/icons/scrt.svg",
+        img: "/icons/scrt.svg",
     },
     {
         chainId: "secret-4",
         displayName: "Secret",
         id: "secret",
-        img: "/public/icons/scrt.svg",
+        img: "/icons/scrt.svg",
     },
     {
         chainId: "cosmoshub-4",
         displayName: "Cosmoshub",
         id: "cosmoshub",
-        img: "/public/icons/atom.png",
+        img: "/icons/atom.png",
     },
 ];
 

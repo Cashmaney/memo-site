@@ -5,6 +5,7 @@
         "start": "CHOKIDAR_USEPOLLING=true vite --host 0.0.0.0  --mode development",
         "build": "tsc && vite build",
         "preview": "npm run build && vite preview",
+        "build:production": "npm run build && npm prune --production",
         "lint": "eslint . --ext .ts,.tsx --fix"
     },
     "dependencies": {
@@ -12,7 +13,6 @@
         "@emotion/styled": "^11.6.0",
         "@mui/icons-material": "^5.3.1",
         "@mui/material": "^5.4.0",
-        "async-await-retry": "^1.2.4",
         "bech32": "2.0.0",
         "react": "^17.0.2",
         "react-device-detect": "2.1.2",
@@ -32,6 +32,7 @@
         "@typescript-eslint/eslint-plugin": "^5.10.2",
         "@vitejs/plugin-react": "^1.1.4",
         "@esbuild-plugins/node-globals-polyfill": "^0.1.1",
+        "@esbuild-plugins/node-modules-polyfill": "^0.1.4",
         "prettier": "^2.5.1",
         "events": "^3.3.0",
         "eslint": "^7.32.0",
