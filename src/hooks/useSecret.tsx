@@ -8,8 +8,10 @@ import { Keplr } from "@keplr-wallet/types";
 import { setupKeplrCustomChain } from "./scrt/utils";
 import { OfflineSigner } from "@cosmjs/launchpad";
 import { OfflineDirectSigner } from "@cosmjs/proto-signing";
-import { SecretUtils } from "secretjs/types/enigmautils";
 import { PERMIT_NAME } from "../contracts/scrt/memo";
+import { convertBech32 } from "../utils/address";
+import { EncryptionUtils } from "secretjs/dist/encryption";
+import { pubkeyToAddress } from "@cosmjs/launchpad/build/address";
 
 declare global {
     interface Window {
@@ -21,9 +23,10 @@ declare global {
         getOfflineSignerAuto?: (
             chainId: string,
         ) => Promise<OfflineSigner | OfflineDirectSigner>;
-        getEnigmaUtils?: (chainId: string) => SecretUtils;
+        getEnigmaUtils?: (chainId: string) => EncryptionUtils;
     }
 }
+
 //
 // const BALANCE_REFRESH_TIME = 15_000;
 
@@ -84,7 +87,8 @@ export const getPermitFromUser = async (
     tokens: string[],
     permissions: Permission[],
 ): Promise<Permit | undefined> => {
-    const storagePermitName = getStoragePermitName(account, permitName);
+    const asScrtAccount = convertBech32(account, "secret");
+    const storagePermitName = getStoragePermitName(asScrtAccount, permitName);
 
     const rawPermit = getFromLS(storagePermitName);
     if (!rawPermit) {
@@ -105,6 +109,17 @@ export const getPermitFromUser = async (
 
 export const setPermit = (permitName: string, permit: Permit) => {
     return setToLS(permitName, JSON.stringify(permit));
+};
+
+export const matchUserWithPermit = (
+    permit: Permit,
+    account: string,
+): boolean => {
+    const secretAcc = convertBech32(account, "secret");
+    const permitAcc = pubkeyToAddress(permit.signature.pub_key, "secret");
+
+    return permitAcc === secretAcc;
+    // permit.signature.pub_key.value
 };
 
 export const SecretContext: React.FC<React.ReactNode> = (props) => {
@@ -156,8 +171,9 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
             );
 
             if (permit) {
+                const asScrtAccount = convertBech32(account, "secret");
                 const storagePermitName = getStoragePermitName(
-                    account,
+                    asScrtAccount,
                     permitName,
                 );
 
@@ -171,7 +187,13 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
 
     const getLocalPermit = (permitName: string): Permit | undefined => {
         console.log(`getting permit for ${account} name: ${permitName}`);
-        const storagePermitName = getStoragePermitName(account, permitName);
+
+        const asScrtAccount = convertBech32(account, "secret");
+
+        const storagePermitName = getStoragePermitName(
+            asScrtAccount,
+            permitName,
+        );
         const rawPermit = getFromLS(storagePermitName);
 
         if (rawPermit) {
@@ -264,14 +286,15 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
         );
         const accounts = await keplrOfflineSigner.getAccounts();
 
-        const secretjs = await SecretNetworkClient.create(
-            import.meta.env.VITE_SECRET_RPC,
-            {
-                walletAddress: accounts[0].address,
-                chainId: chainId || import.meta.env.VITE_SECRET_CHAIN_ID,
-                wallet: keplrOfflineSigner,
-            },
-        );
+        const secretjs = await SecretNetworkClient.create({
+            rpcUrl: import.meta.env.VITE_SECRET_RPC,
+            walletAddress: convertBech32(accounts[0].address, "secret"),
+            chainId: chainId || import.meta.env.VITE_SECRET_CHAIN_ID,
+            wallet: keplrOfflineSigner,
+            encryptionUtils: window.getEnigmaUtils(
+                chainId || import.meta.env.VITE_SECRET_CHAIN_ID,
+            ),
+        });
 
         setAccount(accounts[0].address);
         setSecretJS(secretjs);

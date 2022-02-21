@@ -110,7 +110,7 @@ export const getMessages = async (
 ): Promise<ReadMessagesResponse> => {
     const msg = new ReadMessages(address, auth, page, page_size).to_msg();
 
-    console.log(`getting messages for: ${address}`);
+    console.log(`querying with data: ${JSON.stringify(msg)}`);
 
     return secretjs.query.compute
         .queryContract({
@@ -118,9 +118,12 @@ export const getMessages = async (
             codeHash: codeHash,
             query: msg,
         })
-        .catch((e) => {
+        .catch((e: Error) => {
+            console.error(`Error getting data: ${e}`);
             if (onFail) {
                 onFail(e);
+            } else {
+                throw new Error(e.message);
             }
         });
 };

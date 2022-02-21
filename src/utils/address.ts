@@ -1,6 +1,23 @@
 import { Bech32Config } from "@keplr-wallet/types";
 import { bech32 } from "bech32";
 
+export const bech32FromPubkey = (pubkey: string, hrp: string): string => {
+    const decodedB64 = atob(pubkey);
+    const rawLength = decodedB64.length;
+    const array = new Uint8Array(new ArrayBuffer(rawLength));
+
+    for (let i = 0; i < rawLength; i++) {
+        array[i] = decodedB64.charCodeAt(i);
+    }
+
+    return bech32.encode(hrp, bech32.toWords(array), 32);
+};
+
+export const convertBech32 = (address: string, toHrp: string): string => {
+    const { words } = bech32.decode(address);
+    return bech32.encode(toHrp, words);
+};
+
 export const isValidSecretAddress = (address: string): boolean => {
     try {
         const { prefix } = bech32.decode(address);

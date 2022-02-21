@@ -120,7 +120,7 @@ const SendMsgForm: React.FC<{
                     >
                         Send
                     </span>{" "}
-                    Whisper
+                    Whisprs
                 </Typography>
                 <div
                     style={{

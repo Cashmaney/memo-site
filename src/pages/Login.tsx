@@ -64,7 +64,7 @@ const Login = () => {
                                     justifyContent: "center",
                                 }}
                             >
-                                <Typography variant={"h1"}>Whisper</Typography>
+                                <Typography variant={"h1"}>Whisprs</Typography>
                             </Grid>
                             <Grid
                                 item

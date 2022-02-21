@@ -2,6 +2,7 @@ import React from "react";
 import Button from "@mui/material/Button";
 import { useSecret, getPermitFromUser } from "../../hooks/useSecret";
 import { PERMIT_NAME, PERMIT_PERMISSION } from "../../contracts/scrt/memo";
+import { toast } from "react-toastify";
 
 const CreatePasswordButton: React.FC = () => {
     const { secretjs, account } = useSecret();
@@ -23,8 +24,9 @@ const CreatePasswordButton: React.FC = () => {
                         .then(() => {
                             console.log("yay");
                         })
-                        .catch(() => {
-                            console.log("aww");
+                        .catch((reason) => {
+                            console.error(`Failed to sign permit: ${reason}`);
+                            toast.error(`Failed to sign permit`);
                         });
                 }}
             >
