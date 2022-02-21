@@ -5,7 +5,7 @@ import { PERMIT_NAME, PERMIT_PERMISSION } from "../../contracts/scrt/memo";
 import { toast } from "react-toastify";
 
 const CreatePasswordButton: React.FC = () => {
-    const { secretjs, account } = useSecret();
+    const { secretjs, account, chainId } = useSecret();
 
     return (
         <>
@@ -17,6 +17,7 @@ const CreatePasswordButton: React.FC = () => {
                     }
                     getPermitFromUser(
                         account,
+                        chainId,
                         PERMIT_NAME,
                         [import.meta.env.VITE_MEMO_CONTRACT_ADDRESS],
                         PERMIT_PERMISSION,

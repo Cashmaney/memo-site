@@ -1,4 +1,4 @@
-import { StdSignDoc } from "secretjs/types/encoding";
+import { StdSignDoc } from "secretjs/dist/wallet_amino";
 import { Keplr } from "@keplr-wallet/types";
 
 export type Permission = "owner" | "history" | "balance" | "Allowance";

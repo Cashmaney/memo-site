@@ -70,10 +70,11 @@ const SendMsgForm: React.FC<{
                 },
                 (error: Error) => {
                     toast.dismiss("sending");
-                    if (error.message === "Request rejected") {
+                    if (error?.message === "Request rejected") {
                         toast.error(`Request canceled`);
                     } else {
-                        toast.error(`Failed to send memo: ${error.message}`);
+                        console.error(error);
+                        toast.error(`Failed to send memo`);
                     }
                 },
             ).finally(() => {
@@ -81,7 +82,7 @@ const SendMsgForm: React.FC<{
             });
             toast.info("Sending memo...", {
                 autoClose: false,
-                toastId: "loading_keplr",
+                toastId: "sending",
             });
         }
     };

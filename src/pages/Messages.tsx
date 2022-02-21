@@ -15,19 +15,16 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { Else, If, Then } from "react-if";
 import SendMsgModal from "../components/modals/SendMsgModal";
-import Button from "@mui/material/Button";
-import Paper from "@mui/material/Paper";
-import { Typography, useTheme } from "@mui/material";
-import { toDisplayAddress } from "../utils/address";
+import { IconButton } from "@mui/material";
 import Box from "@mui/material/Box";
 import Navbar from "../components/layout/navBar/Navbar";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 const MessagesPage: React.FC = () => {
-    const { secretjs, account, permit, chainId } = useSecret();
+    const { secretjs, account, permit, chainId, getLocalPermit } = useSecret();
     const [loadingMsgs, setLoading] = useState<boolean>(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const navigate = useNavigate();
-    const theme = useTheme();
 
     useEffect(() => {
         if (!permit) {
@@ -40,11 +37,17 @@ const MessagesPage: React.FC = () => {
             console.log(`getting messages for: ${account} ${chainId}`);
             if (permit) {
                 if (!matchUserWithPermit(permit, account)) {
+                    if (getLocalPermit(PERMIT_NAME)) {
+                        return;
+                    }
+
                     toast.info(
                         `Permit does not match this account. Please sign new permit`,
                     );
+
                     getPermitFromUser(
                         account,
+                        chainId,
                         PERMIT_NAME,
                         [import.meta.env.VITE_MEMO_CONTRACT_ADDRESS],
                         PERMIT_PERMISSION,
@@ -99,11 +102,20 @@ const MessagesPage: React.FC = () => {
                     <Box
                         sx={{
                             display: "flex",
-                            justifyContent: "flex-start",
+                            justifyContent: "space-between",
                             marginLeft: "9vw",
+                            marginRight: "9vw",
                         }}
                     >
                         <SendMsgModal />
+                        <IconButton
+                            onClick={() => {
+                                getMyMessages();
+                            }}
+                            sx={{ p: 2, m: 2 }}
+                        >
+                            <RefreshIcon />
+                        </IconButton>
                     </Box>
                     <MessagesTable messages={messages} loading={loadingMsgs} />
                 </>

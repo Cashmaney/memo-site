@@ -1,5 +1,6 @@
 import { Permission, Permit } from "../../hooks/scrt/permit";
-import { MsgExecuteContract, SecretNetworkClient } from "secretjs";
+import { SecretNetworkClient, Tx } from "secretjs";
+import { DeliverTxResponse } from "secretjs/dist/secret_network_client";
 
 export class SendMemoMsg {
     send_memo: {
@@ -72,28 +73,33 @@ export const sendMemo = async (
     to: string,
     message: string,
     codeHash?: string,
-    onLoading?: CallableFunction,
+    // onLoading?: CallableFunction,
     onSuccess?: CallableFunction,
     onFail?: CallableFunction,
 ) => {
+    console.log(`sending: ${message}, to ${to}`);
+
     const msg = new SendMemoMsg(to, message).to_msg();
 
-    sender.tx.compute
+    console.log(`sending: ${JSON.stringify(msg)}`);
+
+    return sender.tx.compute
         .executeContract({
             codeHash,
             contract,
             msg,
             sender: sender.address,
         })
-        .then(() => {
+        .then((response: DeliverTxResponse) => {
             if (onSuccess) {
-                onSuccess();
+                onSuccess(response);
             }
         })
-        .catch((e) => {
-            console.log(`error: ${e}`);
+        .catch((e: Error) => {
             if (onFail) {
                 onFail(e);
+            } else {
+                throw new Error(e.message);
             }
         });
 };

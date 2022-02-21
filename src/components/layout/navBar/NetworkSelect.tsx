@@ -18,6 +18,10 @@ const StyledButton = styled("button")(
   font-family: Inter, sans-serif; 
   font-size: 1.2rem;
 
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 0.5em;
   box-sizing: border-box;
   min-height: calc(1.5em + 22px);
   min-width: 150px;
@@ -60,6 +64,7 @@ const StyledListbox = styled("ul")(
   padding: 5px;
   margin: 10px 0;
   min-width: 220px;
+  
   background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
   border: 1px solid ${theme.palette.mode === "dark" ? grey[800] : grey[300]};
   border-radius: 0.75em;
@@ -75,6 +80,9 @@ const StyledOption = styled(OptionUnstyled)(
   padding: 8px;
   border-radius: 0.45em;
   cursor: default;
+  gap: 0.5em;
+  display: flex;
+  align-items: center;
 
   &:last-of-type {
     border-bottom: none;
@@ -147,6 +155,34 @@ CustomSelect.propTypes = {
     }),
 };
 
+interface Network {
+    chainId: string;
+    displayName: string;
+    id: string;
+    img: string;
+}
+
+const networks: Network[] = [
+    {
+        chainId: "pulsar-2",
+        displayName: "Secret Testnet",
+        id: "secret-testnet",
+        img: "/public/icons/scrt.svg",
+    },
+    {
+        chainId: "secret-4",
+        displayName: "Secret",
+        id: "secret",
+        img: "/public/icons/scrt.svg",
+    },
+    {
+        chainId: "cosmoshub-4",
+        displayName: "Cosmoshub",
+        id: "cosmoshub",
+        img: "/public/icons/atom.png",
+    },
+];
+
 export default function NetworkSelect() {
     const { setupSecretJS, setChainId } = useSecret();
     const [network, setNetwork] = React.useState(
@@ -173,9 +209,19 @@ export default function NetworkSelect() {
                 <StyledOption value={""} disabled>
                     Select A Network
                 </StyledOption>
-                <StyledOption value={"secret-4"}>Secret</StyledOption>
-                <StyledOption value={"cosmoshub-4"}>Cosmos</StyledOption>
-                <StyledOption value={"pulsar-2"}>Secret Testnet</StyledOption>
+                {networks.map((net) => {
+                    return (
+                        <StyledOption key={net.id} value={net.chainId}>
+                            <img
+                                loading="lazy"
+                                width="20"
+                                src={net.img}
+                                alt={`Image`}
+                            />
+                            {net.displayName}
+                        </StyledOption>
+                    );
+                })}
             </CustomSelect>
         </div>
     );

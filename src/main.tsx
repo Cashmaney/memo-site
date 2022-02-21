@@ -74,6 +74,15 @@ const theme = createTheme({
                 },
             },
         },
+        MuiIconButton: {
+            styleOverrides: {
+                root: {
+                    "&:hover": {
+                        backgroundColor: "#2c2f33",
+                    },
+                },
+            },
+        },
         MuiInputBase: {
             styleOverrides: {
                 root: {

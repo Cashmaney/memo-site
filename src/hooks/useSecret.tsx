@@ -12,6 +12,7 @@ import { PERMIT_NAME } from "../contracts/scrt/memo";
 import { convertBech32 } from "../utils/address";
 import { EncryptionUtils } from "secretjs/dist/encryption";
 import { pubkeyToAddress } from "@cosmjs/launchpad/build/address";
+import { toast } from "react-toastify";
 
 declare global {
     interface Window {
@@ -83,6 +84,7 @@ const getStoragePermitName = (account: string, permitName: string) => {
 
 export const getPermitFromUser = async (
     account: string,
+    chainId: string,
     permitName: string,
     tokens: string[],
     permissions: Permission[],
@@ -95,7 +97,7 @@ export const getPermitFromUser = async (
         const permit = await signPermit(
             window.keplr as Keplr,
             account,
-            import.meta.env.VITE_SECRET_CHAIN_ID,
+            chainId,
             permitName,
             tokens,
             permissions,
@@ -242,11 +244,15 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
     useEffect(() => {
         // first load, instantly refresh balances
         if (secretjs && account) {
-            getScrtBalance(secretjs, account).then((balance) => {
-                if (balance) {
-                    setScrtBalance(balance);
-                }
-            });
+            if (chainId === import.meta.env.VITE_SECRET_CHAIN_ID) {
+                getScrtBalance(secretjs, account).then((balance) => {
+                    if (balance) {
+                        setScrtBalance(balance);
+                    }
+                });
+            } else {
+                setScrtBalance(undefined);
+            }
         }
         if (account) {
             getLocalPermit(PERMIT_NAME);
@@ -274,7 +280,7 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
         // await window.keplr.enable([
         //     "secret-4",
         //     "cosmoshub-4",
-        //     "import.meta.env.VITE_SECRET_CHAIN_ID",
+        //     import.meta.env.VITE_SECRET_CHAIN_ID,
         // ]);
 
         // await window.keplr.enable(import.meta.env.VITE_SECRET_CHAIN_ID);
