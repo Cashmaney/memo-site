@@ -211,7 +211,7 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
 
     const getLocalPermit = (
         permitName: string,
-        setStorage?: boolean,
+        setStorage = true,
     ): Permit | undefined => {
         console.log(`getting permit for ${account} name: ${permitName}`);
 
