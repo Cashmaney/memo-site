@@ -30,7 +30,7 @@ export const isValidSecretAddress = (address: string): boolean => {
 export const isValidBech32 = (address: string): boolean => {
     try {
         const { prefix } = bech32.decode(address);
-        return address.length === 45;
+        return true;
     } catch (e) {
         return false;
     }
