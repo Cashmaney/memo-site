@@ -1,6 +1,5 @@
 import { Permission, Permit } from "../../hooks/scrt/permit";
 import { SecretNetworkClient, Tx } from "secretjs";
-import { DeliverTxResponse } from "secretjs/dist/secret_network_client";
 
 export class SendMemoMsg {
     send_memo: {
@@ -90,7 +89,7 @@ export const sendMemo = async (
             msg,
             sender: sender.address,
         })
-        .then((response: DeliverTxResponse) => {
+        .then((response: Tx) => {
             if (onSuccess) {
                 onSuccess(response);
             }

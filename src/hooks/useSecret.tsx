@@ -1,6 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { getFromLS, setToLS } from "../utils/storage";
-import { SecretNetworkClient } from "secretjs";
+import {
+    base64PubkeyToAddress,
+    EncryptionUtils,
+    SecretNetworkClient,
+} from "secretjs";
 import { sleep } from "../utils/functions";
 import { newPermit as signPermit, Permission, Permit } from "./scrt/permit";
 import { Keplr } from "@keplr-wallet/types";
@@ -10,9 +14,6 @@ import { OfflineSigner } from "@cosmjs/launchpad";
 import { OfflineDirectSigner } from "@cosmjs/proto-signing";
 import { PERMIT_NAME } from "../contracts/scrt/memo";
 import { convertBech32 } from "../utils/address";
-import { EncryptionUtils } from "secretjs/dist/encryption";
-import { pubkeyToAddress } from "@cosmjs/launchpad/build/address";
-import { toast } from "react-toastify";
 
 declare global {
     interface Window {
@@ -118,7 +119,10 @@ export const matchUserWithPermit = (
     account: string,
 ): boolean => {
     const secretAcc = convertBech32(account, "secret");
-    const permitAcc = pubkeyToAddress(permit.signature.pub_key, "secret");
+    const permitAcc = base64PubkeyToAddress(
+        permit.signature.pub_key.value,
+        "secret",
+    );
 
     return permitAcc === secretAcc;
     // permit.signature.pub_key.value
