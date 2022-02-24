@@ -164,12 +164,6 @@ interface Network {
 
 const networks: Network[] = [
     {
-        chainId: "pulsar-2",
-        displayName: "Secret Testnet",
-        id: "secret-testnet",
-        img: "/icons/scrt.svg",
-    },
-    {
         chainId: "secret-4",
         displayName: "Secret",
         id: "secret",
@@ -181,10 +175,22 @@ const networks: Network[] = [
         id: "cosmoshub",
         img: "/icons/atom.png",
     },
+    {
+        chainId: "juno-1",
+        displayName: "Juno",
+        id: "juno",
+        img: "/icons/juno.svg",
+    },
+    {
+        chainId: "osmosis-1",
+        displayName: "Osmosis",
+        id: "osmosis",
+        img: "/icons/osmosis.svg",
+    },
 ];
 
 export default function NetworkSelect() {
-    const { setupSecretJS, setChainId } = useSecret();
+    const { setChainId } = useSecret();
     const [network, setNetwork] = React.useState(
         import.meta.env.VITE_SECRET_CHAIN_ID,
     );
@@ -222,6 +228,20 @@ export default function NetworkSelect() {
                         </StyledOption>
                     );
                 })}
+                {import.meta.env.MODE !== "production" ? (
+                    <StyledOption
+                        key={"pulsar-2"}
+                        value={import.meta.env.VITE_SECRET_CHAIN_ID}
+                    >
+                        <img
+                            loading="lazy"
+                            width="20"
+                            src={"/icons/scrt.svg"}
+                            alt={`Image`}
+                        />
+                        {"Testnet"}
+                    </StyledOption>
+                ) : null}
             </CustomSelect>
         </div>
     );

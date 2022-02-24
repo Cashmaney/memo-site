@@ -19,6 +19,7 @@ import { IconButton } from "@mui/material";
 import Box from "@mui/material/Box";
 import Navbar from "../components/layout/navBar/Navbar";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import { sleep } from "../utils/functions";
 
 const MessagesPage: React.FC = () => {
     const { secretjs, account, permit, chainId, getLocalPermit } = useSecret();
@@ -27,9 +28,13 @@ const MessagesPage: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!permit) {
-            navigate("/login");
-        }
+        const stuff = async () => {
+            await sleep(200);
+            if (!permit) {
+                navigate("/login");
+            }
+        };
+        stuff();
     }, [permit]);
 
     const getMyMessages = async (): Promise<void> => {
@@ -89,7 +94,7 @@ const MessagesPage: React.FC = () => {
     useEffect(() => {
         // noinspection JSIgnoredPromiseFromCall
         getMyMessages();
-    }, [account, permit]);
+    }, [chainId, permit]);
 
     return (
         <If condition={!permit}>

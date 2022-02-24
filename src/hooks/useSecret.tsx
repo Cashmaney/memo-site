@@ -143,9 +143,22 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
     );
 
     useEffect(() => {
-        if (secretjs) {
-            setupSecretJS(chainId);
-        }
+        const stuff = async () => {
+            if (!secretjs) {
+                await setupSecretJS(chainId);
+            } else {
+                if (window.getOfflineSignerOnlyAmino) {
+                    const keplrOfflineSigner = window.getOfflineSignerOnlyAmino(
+                        chainId || import.meta.env.VITE_SECRET_CHAIN_ID,
+                    );
+                    const accounts = await keplrOfflineSigner.getAccounts();
+                    console.log(`setting account: ${accounts[0].address}`);
+                    setAccount(accounts[0].address);
+                    getLocalPermit(accounts[0].address);
+                }
+            }
+        };
+        stuff();
     }, [chainId]);
 
     //const [permitManager] = useState<PermitManager>(new PermitManager());
@@ -249,6 +262,7 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
         // first load, instantly refresh balances
         if (secretjs && account) {
             if (chainId === import.meta.env.VITE_SECRET_CHAIN_ID) {
+                console.log(`getting balance for ${account}`);
                 getScrtBalance(secretjs, account).then((balance) => {
                     if (balance) {
                         setScrtBalance(balance);
@@ -258,10 +272,7 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
                 setScrtBalance(undefined);
             }
         }
-        if (account) {
-            getLocalPermit(PERMIT_NAME);
-        }
-    }, [account]);
+    }, [secretjs, account]);
 
     const setupSecretJS = async (chainId?: string) => {
         // Wait for Keplr to be injected to the page
