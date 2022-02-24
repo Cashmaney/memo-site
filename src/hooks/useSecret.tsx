@@ -154,12 +154,17 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
                     const accounts = await keplrOfflineSigner.getAccounts();
                     console.log(`setting account: ${accounts[0].address}`);
                     setAccount(accounts[0].address);
-                    getLocalPermit(accounts[0].address);
                 }
             }
         };
         stuff();
     }, [chainId]);
+
+    useEffect(() => {
+        if (account) {
+            getLocalPermit(PERMIT_NAME);
+        }
+    }, [account]);
 
     //const [permitManager] = useState<PermitManager>(new PermitManager());
 
