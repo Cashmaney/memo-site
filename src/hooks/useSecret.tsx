@@ -160,11 +160,11 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
         stuff();
     }, [chainId]);
 
-    useEffect(() => {
-        if (account) {
-            getLocalPermit(PERMIT_NAME);
-        }
-    }, [account]);
+    // useEffect(() => {
+    //     if (account) {
+    //         getLocalPermit(PERMIT_NAME);
+    //     }
+    // }, [account]);
 
     //const [permitManager] = useState<PermitManager>(new PermitManager());
 
@@ -209,7 +209,10 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
         }
     };
 
-    const getLocalPermit = (permitName: string): Permit | undefined => {
+    const getLocalPermit = (
+        permitName: string,
+        setStorage?: boolean,
+    ): Permit | undefined => {
         console.log(`getting permit for ${account} name: ${permitName}`);
 
         const asScrtAccount = convertBech32(account, "secret");
@@ -222,7 +225,7 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
 
         if (rawPermit) {
             const parsed = JSON.parse(rawPermit);
-            if (parsed !== accountPermit) {
+            if (setStorage && parsed !== accountPermit) {
                 setPermit(parsed);
             }
             return parsed;

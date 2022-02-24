@@ -115,9 +115,12 @@ function Navbar() {
                                 chainId === import.meta.env.VITE_SECRET_CHAIN_ID
                             }
                         >
-                            <BalanceBox>
-                                {toDisplayBalance(scrtBalance || "0")} SCRT
-                            </BalanceBox>
+                            {" "}
+                            <Then>
+                                <BalanceBox>
+                                    {toDisplayBalance(scrtBalance || "0")} SCRT
+                                </BalanceBox>
+                            </Then>
                         </If>
 
                         <Box sx={{ m: 2 }}>

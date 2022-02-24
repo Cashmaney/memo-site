@@ -38,38 +38,43 @@ const MessagesPage: React.FC = () => {
     }, [permit]);
 
     const getMyMessages = async (): Promise<void> => {
+        console.log(`triggered this: ${account} ${secretjs}`);
+        let matchedPermit = permit;
         if (account && secretjs) {
             console.log(`getting messages for: ${account} ${chainId}`);
             if (permit) {
                 if (!matchUserWithPermit(permit, account)) {
-                    if (getLocalPermit(PERMIT_NAME)) {
-                        return;
+                    matchedPermit = getLocalPermit(PERMIT_NAME, false);
+
+                    if (!matchUserWithPermit(matchedPermit!, account)) {
+                        toast.info(
+                            `Permit does not match this account. Please sign new permit`,
+                        );
+                        setLoading(true);
+                        matchedPermit = await getPermitFromUser(
+                            account,
+                            chainId,
+                            PERMIT_NAME,
+                            [import.meta.env.VITE_MEMO_CONTRACT_ADDRESS],
+                            PERMIT_PERMISSION,
+                        ).catch((reason) => {
+                            console.error(`Failed to sign permit: ${reason}`);
+                            toast.error(`Failed to sign permit`);
+                            setMessages([]);
+                            setLoading(false);
+                            return undefined;
+                        });
+                        if (!matchedPermit) {
+                            return;
+                        }
                     }
-
-                    toast.info(
-                        `Permit does not match this account. Please sign new permit`,
-                    );
-
-                    getPermitFromUser(
-                        account,
-                        chainId,
-                        PERMIT_NAME,
-                        [import.meta.env.VITE_MEMO_CONTRACT_ADDRESS],
-                        PERMIT_PERMISSION,
-                    ).catch((reason) => {
-                        console.error(`Failed to sign permit: ${reason}`);
-                        toast.error(`Failed to sign permit`);
-                    });
-                    setMessages([]);
-                    return;
                 }
-
                 setLoading(true);
                 getMessages(
                     secretjs,
                     import.meta.env.VITE_MEMO_CONTRACT_ADDRESS,
                     account,
-                    { permit },
+                    { permit: matchedPermit },
                     import.meta.env.VITE_MEMO_CONTRACT_CODE_HASH,
                 )
                     .then((resp) => {
@@ -94,7 +99,7 @@ const MessagesPage: React.FC = () => {
     useEffect(() => {
         // noinspection JSIgnoredPromiseFromCall
         getMyMessages();
-    }, [chainId, permit]);
+    }, [account]);
 
     return (
         <If condition={!permit}>
