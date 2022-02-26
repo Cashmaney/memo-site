@@ -4,22 +4,22 @@ import CreatePermitButton from "../components/scrt/CreatePermitButton";
 import CreatePasswordButton from "../components/scrt/CreatePasswordButton";
 import { useSecret } from "../hooks/useSecret";
 import { Else, If, Then } from "react-if";
+
 import ConnectSecret from "../components/scrt/ConnectSecret";
 import { toDisplayAddress } from "../utils/address";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import Paper from "@mui/material/Paper";
 
-window.addEventListener("keplr_keystorechange", () => {
-    console.log("Key store in Keplr is changed. Refreshing page.");
-    location.reload();
-});
-
 const Login = () => {
     const { account, permit, chainId } = useSecret();
     const navigate = useNavigate();
     // const { width } = useWindowSize();
     // const isMobile = parseInt(breakingPoints.medium) > width;
+
+    useEffect(() => {
+        console.log(`loaded event listening`);
+    }, []);
 
     useEffect(() => {
         if (permit) {
