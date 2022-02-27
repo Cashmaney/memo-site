@@ -115,9 +115,13 @@ export const setPermit = (permitName: string, permit: Permit) => {
 };
 
 export const matchUserWithPermit = (
-    permit: Permit,
+    permit: Permit | undefined,
     account: string,
 ): boolean => {
+    if (!permit?.signature?.pub_key) {
+        return false;
+    }
+
     const secretAcc = convertBech32(account, "secret");
     const permitAcc = base64PubkeyToAddress(
         permit.signature.pub_key.value,

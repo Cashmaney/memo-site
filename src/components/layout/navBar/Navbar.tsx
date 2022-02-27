@@ -115,7 +115,6 @@ function Navbar() {
                                 chainId === import.meta.env.VITE_SECRET_CHAIN_ID
                             }
                         >
-                            {" "}
                             <Then>
                                 <BalanceBox>
                                     {toDisplayBalance(scrtBalance || "0")} SCRT

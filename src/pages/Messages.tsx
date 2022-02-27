@@ -46,7 +46,7 @@ const MessagesPage: React.FC = () => {
                 if (!matchUserWithPermit(permit, account)) {
                     matchedPermit = getLocalPermit(PERMIT_NAME, false);
 
-                    if (!matchUserWithPermit(matchedPermit!, account)) {
+                    if (!matchUserWithPermit(matchedPermit, account)) {
                         toast.info(
                             `Permit does not match this account. Please sign new permit`,
                         );
