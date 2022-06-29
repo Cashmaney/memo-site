@@ -6,7 +6,7 @@ import {
     SecretNetworkClient,
 } from "secretjs";
 import { sleep } from "../utils/functions";
-import { newPermit as signPermit, Permission, Permit } from "./scrt/permit";
+import { newPermit as signPermit, Permission, Permit } from "secretjs";
 import { Keplr } from "@keplr-wallet/types";
 // import { TokenID } from "../utils/nft";
 import { setupKeplrCustomChain } from "./scrt/utils";
@@ -14,6 +14,7 @@ import { OfflineSigner } from "@cosmjs/launchpad";
 import { OfflineDirectSigner } from "@cosmjs/proto-signing";
 import { PERMIT_NAME } from "../contracts/scrt/memo";
 import { convertBech32 } from "../utils/address";
+import { AminoSigner } from "secretjs/dist/wallet_amino";
 
 declare global {
     interface Window {
@@ -96,12 +97,13 @@ export const getPermitFromUser = async (
     const rawPermit = getFromLS(storagePermitName);
     if (!rawPermit) {
         const permit = await signPermit(
-            window.keplr as Keplr,
+            window.keplr as unknown as AminoSigner,
             account,
             chainId,
             permitName,
             tokens,
             permissions,
+            true,
         );
         setPermit(storagePermitName, permit);
         return permit;
@@ -190,12 +192,13 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
                 return accountPermit;
             }
             const permit = await signPermit(
-                window.keplr as Keplr,
+                window.keplr as unknown as AminoSigner,
                 account,
                 chainId,
                 permitName,
                 tokens,
                 permissions,
+                true,
             );
 
             if (permit) {
@@ -320,7 +323,7 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
         const accounts = await keplrOfflineSigner.getAccounts();
 
         const secretjs = await SecretNetworkClient.create({
-            rpcUrl: import.meta.env.VITE_SECRET_RPC,
+            grpcWebUrl: import.meta.env.VITE_SECRET_GRPC,
             walletAddress: convertBech32(accounts[0].address, "secret"),
             chainId: chainId || import.meta.env.VITE_SECRET_CHAIN_ID,
             wallet: keplrOfflineSigner,

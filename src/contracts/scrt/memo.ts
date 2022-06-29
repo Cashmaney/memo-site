@@ -1,5 +1,4 @@
-import { Permission, Permit } from "../../hooks/scrt/permit";
-import { SecretNetworkClient, Tx } from "secretjs";
+import { SecretNetworkClient, Tx, Permission, Permit } from "secretjs";
 
 export class SendMemoMsg {
     send_memo: {
@@ -21,16 +20,22 @@ export class SendMemoMsg {
     }
 }
 
-export class ReadMessages {
-    get_memo: {
-        auth: {
-            permit?: Permit;
-            key?: string;
-        };
-        address: string;
-        page?: number;
-        page_size?: number;
+export interface IGetMemoReq {
+    auth: {
+        permit?: Permit;
+        key?: string;
     };
+    address: string;
+    page?: number;
+    page_size?: number;
+}
+
+export interface IReadMessages {
+    get_memo: IGetMemoReq;
+}
+
+export class ReadMessages {
+    get_memo: IGetMemoReq;
 
     constructor(
         address: string,
@@ -83,15 +88,26 @@ export const sendMemo = async (
     console.log(`sending: ${JSON.stringify(msg)}`);
 
     return sender.tx.compute
-        .executeContract({
-            codeHash,
-            contract,
-            msg,
-            sender: sender.address,
-        })
+        .executeContract(
+            {
+                codeHash,
+                contractAddress: contract,
+                msg,
+                sender: sender.address,
+            },
+            {
+                gasLimit: 50_000,
+            },
+        )
         .then((response: Tx) => {
-            if (onSuccess) {
-                onSuccess(response);
+            if (response.code === 0) {
+                if (onSuccess) {
+                    onSuccess(response);
+                }
+            } else {
+                if (onFail) {
+                    onFail(new Error(`Failed to send: ${response.rawLog}`));
+                }
             }
         })
         .catch((e: Error) => {
@@ -117,9 +133,17 @@ export const getMessages = async (
 
     console.log(`querying with data: ${JSON.stringify(msg)}`);
 
+    const test = secretjs.query.compute.queryContract({
+        contractAddress: contract,
+        codeHash: codeHash,
+        query: msg,
+    });
+
+    console.log(`resp: ${JSON.stringify(test)}`);
+
     return secretjs.query.compute
-        .queryContract({
-            address: contract,
+        .queryContract<IReadMessages, ReadMessagesResponse>({
+            contractAddress: contract,
             codeHash: codeHash,
             query: msg,
         })
@@ -130,5 +154,6 @@ export const getMessages = async (
             } else {
                 throw new Error(e.message);
             }
+            return { msgs: [] };
         });
 };

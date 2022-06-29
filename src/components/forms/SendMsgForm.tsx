@@ -66,7 +66,7 @@ const SendMsgForm: React.FC<{
                 import.meta.env.VITE_MEMO_CONTRACT_CODE_HASH,
                 () => {
                     toast.dismiss("sending");
-                    toast.success("Memo sent successfully");
+                    toast.success("Whispr sent successfully");
                 },
                 (error: Error) => {
                     toast.dismiss("sending");
@@ -74,13 +74,13 @@ const SendMsgForm: React.FC<{
                         toast.error(`Request canceled`);
                     } else {
                         console.error(error);
-                        toast.error(`Failed to send memo`);
+                        toast.error(`Failed to send whispr, please retry`);
                     }
                 },
             ).finally(() => {
                 handleClose();
             });
-            toast.info("Sending memo...", {
+            toast.info("Whispring...", {
                 autoClose: false,
                 toastId: "sending",
             });
@@ -111,17 +111,19 @@ const SendMsgForm: React.FC<{
                 />
             </div>
 
-            <div style={{ color: "white", padding: "1em" }}>
-                <Typography variant={"h3"}>
+            <div style={{ color: theme.palette.primary.main, padding: "1em" }}>
+                <Typography
+                    variant={"h4"}
+                    sx={{ display: "flex", justifyContent: "center" }}
+                >
                     <span
                         style={{
-                            color: theme.palette.primary.main,
+                            color: "white",
                             marginRight: "0.5rem",
                         }}
                     >
-                        Send
-                    </span>{" "}
-                    Whisprs
+                        Whispr
+                    </span>
                 </Typography>
                 <div
                     style={{
