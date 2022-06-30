@@ -144,11 +144,24 @@ const Login = () => {
                                         </Grid>
                                     </Else>
                                 </If>
+
                                 <Grid item>
                                     <Typography variant={"caption"}>
                                         Powered by Secret Network
                                     </Typography>
                                 </Grid>
+                            </Grid>
+                            <Grid>
+                                <Typography variant={"caption"}>
+                                    Built by{" "}
+                                    <a
+                                        style={{ color: "grey" }}
+                                        href={"https://twitter.com/cashmaney3"}
+                                        target={"_blank"}
+                                    >
+                                        Cashmaney
+                                    </a>
+                                </Typography>
                             </Grid>
                         </Grid>
                     </Paper>
