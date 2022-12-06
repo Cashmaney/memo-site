@@ -118,42 +118,6 @@ const StyledPopper = styled(PopperUnstyled)`
     z-index: 1;
 `;
 
-const Paragraph = styled("p")(
-    ({ theme }) => `
-  font-family: IBM Plex Sans, sans-serif;
-  font-size: 0.875rem;
-  margin: 10px 0;
-  color: ${theme.palette.mode === "dark" ? grey[400] : grey[700]};
-  `,
-);
-
-// const CustomSelect = React.forwardRef(function CustomSelect<TValue>(
-//     props: SelectUnstyledProps<TValue>,
-//     ref: React.ForwardedRef<HTMLUListElement>,
-// ) {
-//     const components = {
-//         Root: StyledButton,
-//         Listbox: StyledListbox,
-//         Popper: StyledPopper,
-//     };
-//     return <SelectUnstyled {...props} ref={ref} />;
-// }) as <TValue>(
-//     props: SelectUnstyledProps<TValue> & React.RefAttributes<HTMLUListElement>,
-// ) => JSX.Element;
-
-// function CustomSelect(
-//     props: SelectUnstyledProps<TValue>
-// ) {
-//
-//     const components = {
-//         Root: StyledButton,
-//         Listbox: StyledListbox,
-//         Popper: StyledPopper,
-//     };
-//
-//     return <SelectUnstyled/>;
-//     // eslint-disable-next-line @typescript-eslint/ban-types
-// };
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 function CustomSelect(props: SelectUnstyledProps<string>) {
@@ -166,19 +130,6 @@ function CustomSelect(props: SelectUnstyledProps<string>) {
 
     return <SelectUnstyled {...props} slots={slots} />;
 }
-
-// CustomSelect.propTypes = {
-//     /**
-//      * The components used for each slot inside the Select.
-//      * Either a string to use a HTML element or a component.
-//      * @default {}
-//      */
-//     components: PropTypes.shape({
-//         Listbox: PropTypes.elementType,
-//         Popper: PropTypes.elementType,
-//         Root: PropTypes.elementType,
-//     }),
-// };
 
 interface Network {
     chainId: string;
