@@ -1,17 +1,3 @@
-// import { CosmWasmClient } from "secretjs";
-
-import { SecretNetworkClient } from "secretjs";
-
-export const GetContractCodeHash = async ({
-    secretjs,
-    address,
-}: {
-    secretjs: SecretNetworkClient;
-    address: string;
-}): Promise<string> => {
-    return await secretjs.query.compute.contractCodeHash(address);
-};
-
 export const setupKeplrCustomChain = async () => {
     if (!window || !window.keplr) {
         return;

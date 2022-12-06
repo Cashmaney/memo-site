@@ -12,7 +12,6 @@ import { Keplr } from "@keplr-wallet/types";
 import { setupKeplrCustomChain } from "./scrt/utils";
 import { OfflineSigner } from "@cosmjs/launchpad";
 import { OfflineDirectSigner } from "@cosmjs/proto-signing";
-import { PERMIT_NAME } from "../contracts/scrt/memo";
 import { convertBech32 } from "../utils/address";
 import { AminoSigner } from "secretjs/dist/wallet_amino";
 
@@ -251,9 +250,9 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
         setLocalAccount(account);
     };
 
-    const getAccount = (): string | undefined => {
-        return getFromLS("account");
-    };
+    // const getAccount = (): string | undefined => {
+    //     return getFromLS("account");
+    // };
 
     const refreshBalances = async () => {
         if (!account || !secretjs) {
@@ -322,8 +321,8 @@ export const SecretContext: React.FC<React.ReactNode> = (props) => {
         );
         const accounts = await keplrOfflineSigner.getAccounts();
 
-        const secretjs = await SecretNetworkClient.create({
-            grpcWebUrl: import.meta.env.VITE_SECRET_GRPC,
+        const secretjs = new SecretNetworkClient({
+            url: import.meta.env.VITE_SECRET_LCD,
             walletAddress: convertBech32(accounts[0].address, "secret"),
             chainId: chainId || import.meta.env.VITE_SECRET_CHAIN_ID,
             wallet: keplrOfflineSigner,

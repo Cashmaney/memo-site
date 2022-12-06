@@ -1,4 +1,10 @@
-import { SecretNetworkClient, Tx, Permission, Permit } from "secretjs";
+import {
+    SecretNetworkClient,
+    TxResponse,
+    TxResultCode,
+    Permission,
+    Permit,
+} from "secretjs";
 
 export class SendMemoMsg {
     send_memo: {
@@ -90,8 +96,8 @@ export const sendMemo = async (
     return sender.tx.compute
         .executeContract(
             {
-                codeHash,
-                contractAddress: contract,
+                code_hash: codeHash,
+                contract_address: contract,
                 msg,
                 sender: sender.address,
             },
@@ -99,8 +105,8 @@ export const sendMemo = async (
                 gasLimit: 50_000,
             },
         )
-        .then((response: Tx) => {
-            if (response.code === 0) {
+        .then((response: TxResponse) => {
+            if (response.code === TxResultCode.Success) {
                 if (onSuccess) {
                     onSuccess(response);
                 }
@@ -134,8 +140,8 @@ export const getMessages = async (
     console.log(`querying with data: ${JSON.stringify(msg)}`);
 
     const test = secretjs.query.compute.queryContract({
-        contractAddress: contract,
-        codeHash: codeHash,
+        contract_address: contract,
+        code_hash: codeHash,
         query: msg,
     });
 
@@ -143,8 +149,8 @@ export const getMessages = async (
 
     return secretjs.query.compute
         .queryContract<IReadMessages, ReadMessagesResponse>({
-            contractAddress: contract,
-            codeHash: codeHash,
+            contract_address: contract,
+            code_hash: codeHash,
             query: msg,
         })
         .catch((e: Error) => {
