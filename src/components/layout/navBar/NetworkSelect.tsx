@@ -127,33 +127,58 @@ const Paragraph = styled("p")(
   `,
 );
 
-function CustomSelect(
-    props: JSX.IntrinsicAttributes &
-        SelectUnstyledProps<string> &
-        React.RefAttributes<HTMLElement>,
-) {
-    const components = {
-        Root: StyledButton,
-        Listbox: StyledListbox,
-        Popper: StyledPopper,
-        ...props.components,
+// const CustomSelect = React.forwardRef(function CustomSelect<TValue>(
+//     props: SelectUnstyledProps<TValue>,
+//     ref: React.ForwardedRef<HTMLUListElement>,
+// ) {
+//     const components = {
+//         Root: StyledButton,
+//         Listbox: StyledListbox,
+//         Popper: StyledPopper,
+//     };
+//     return <SelectUnstyled {...props} ref={ref} />;
+// }) as <TValue>(
+//     props: SelectUnstyledProps<TValue> & React.RefAttributes<HTMLUListElement>,
+// ) => JSX.Element;
+
+// function CustomSelect(
+//     props: SelectUnstyledProps<TValue>
+// ) {
+//
+//     const components = {
+//         Root: StyledButton,
+//         Listbox: StyledListbox,
+//         Popper: StyledPopper,
+//     };
+//
+//     return <SelectUnstyled/>;
+//     // eslint-disable-next-line @typescript-eslint/ban-types
+// };
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+function CustomSelect(props: SelectUnstyledProps<string>) {
+    const slots: SelectUnstyledProps<string>["slots"] = {
+        root: StyledButton,
+        listbox: StyledListbox,
+        popper: StyledPopper,
+        ...props.slots,
     };
 
-    return <SelectUnstyled {...props} components={components} />;
+    return <SelectUnstyled {...props} slots={slots} />;
 }
 
-CustomSelect.propTypes = {
-    /**
-     * The components used for each slot inside the Select.
-     * Either a string to use a HTML element or a component.
-     * @default {}
-     */
-    components: PropTypes.shape({
-        Listbox: PropTypes.elementType,
-        Popper: PropTypes.elementType,
-        Root: PropTypes.elementType,
-    }),
-};
+// CustomSelect.propTypes = {
+//     /**
+//      * The components used for each slot inside the Select.
+//      * Either a string to use a HTML element or a component.
+//      * @default {}
+//      */
+//     components: PropTypes.shape({
+//         Listbox: PropTypes.elementType,
+//         Popper: PropTypes.elementType,
+//         Root: PropTypes.elementType,
+//     }),
+// };
 
 interface Network {
     chainId: string;
@@ -208,7 +233,7 @@ export default function NetworkSelect() {
         <div>
             <CustomSelect
                 value={network}
-                onChange={(value) => {
+                onChange={(_evt, value) => {
                     handleChange(value);
                 }}
             >

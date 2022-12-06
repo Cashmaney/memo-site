@@ -102,7 +102,7 @@ export const sendMemo = async (
                 sender: sender.address,
             },
             {
-                gasLimit: 50_000,
+                gasLimit: 150_000,
             },
         )
         .then((response: TxResponse) => {
